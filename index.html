@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="theme-color" content="#101522" />
+<title>Royal Sandbox</title>
+<style>
+  :root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;color-scheme:dark}
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#0b1020,#121a2c 40%,#0c1220);color:#fff;min-height:100vh}
+  main{max-width:980px;margin:auto;padding:20px 14px 44px}
+  h1{margin:4px 0 2px;font-size:clamp(28px,7vw,44px)}
+  h2{margin:0 0 12px;font-size:20px}
+  p{line-height:1.45}
+  .sub{opacity:.72;margin-top:0}
+  .panel{background:rgba(28,36,54,.94);border:1px solid rgba(255,255,255,.08);box-shadow:0 14px 30px rgba(0,0,0,.2);padding:16px;border-radius:18px;margin:14px 0}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  input,select,button{font:inherit;border-radius:12px;border:0;min-height:44px}
+  input,select{padding:10px 12px;background:#101827;color:#fff;border:1px solid rgba(255,255,255,.12);flex:1;min-width:160px}
+  button{padding:10px 14px;background:#f5f7ff;color:#111827;font-weight:800;cursor:pointer}
+  button.secondary{background:#2a3653;color:#fff}
+  button.danger{background:#4a2630;color:#fff}
+  button:active{transform:scale(.98)}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+  .stat{background:#131b2d;padding:10px;border-radius:12px;text-align:center}
+  .stat b{display:block;font-size:18px}
+  .muted{opacity:.7}
+  .cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .card{background:#2b3650;padding:12px;border-radius:14px;cursor:pointer;border:2px solid transparent;user-select:none;min-height:108px}
+  .card.on{border-color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.12) inset}
+  .card .name{font-weight:800;margin-bottom:6px}
+  .card .meta{font-size:13px;opacity:.72;margin-top:5px}
+  .deckbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:10px 0}
+  .pill{display:inline-block;background:#111827;padding:6px 10px;border-radius:999px;font-weight:700}
+  .result{font-size:18px;font-weight:800;margin-top:12px;min-height:28px}
+  .battle-log{margin-top:10px;background:#111827;border-radius:12px;padding:10px;white-space:pre-line;font-size:14px;line-height:1.45}
+  .tiny{font-size:12px;opacity:.62}
+  @media(min-width:700px){.cards{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<main>
+  <h1>👑 Royal Sandbox</h1>
+  <p class="sub">Offline browser prototype. Accounts and progress stay on this device.</p>
+
+  <section class="panel">
+    <h2>Account</h2>
+    <div class="row">
+      <input id="name" maxlength="20" placeholder="Account name" autocomplete="off" />
+      <button id="loginBtn">Create / Login</button>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <select id="accountSelect"><option value="">Saved accounts</option></select>
+      <button class="secondary" id="loadBtn">Load</button>
+      <button class="danger" id="deleteBtn">Delete</button>
+    </div>
+    <div id="acct"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Deck Builder</h2>
+    <div class="deckbar"><span class="muted">Choose exactly 8 cards</span><span id="count" class="pill">0/8</span></div>
+    <div id="cards" class="cards"></div>
+    <div class="row" style="margin-top:12px">
+      <button id="saveDeckBtn">Save Deck</button>
+      <button class="secondary" id="randomDeckBtn">Random Deck</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>1v1 Bot Battle</h2>
+    <p class="muted">Quick simulated battle using deck strength, elixir efficiency, and a little randomness.</p>
+    <button id="battleBtn">⚔️ Battle Bot</button>
+    <div id="result" class="result"></div>
+    <div id="battleLog" class="battle-log" hidden></div>
+  </section>
+
+  <p class="tiny">This is an independent fan-made prototype. It does not connect to Supercell or Clash Royale servers.</p>
+</main>
+<script>
+const CARDS=[
+ {id:'knight',name:'Knight',cost:3,hp:700,damage:90},
+ {id:'archers',name:'Archers',cost:3,hp:420,damage:115},
+ {id:'giant',name:'Giant',cost:5,hp:1300,damage:120},
+ {id:'fireball',name:'Fireball',cost:4,hp:0,damage:300},
+ {id:'mini',name:'Mini P.E.K.K.A',cost:4,hp:650,damage:260},
+ {id:'bats',name:'Bats',cost:2,hp:220,damage:145},
+ {id:'musk',name:'Musketeer',cost:4,hp:520,damage:175},
+ {id:'valk',name:'Valkyrie',cost:4,hp:850,damage:130},
+ {id:'hog',name:'Hog Rider',cost:4,hp:900,damage:185},
+ {id:'zap',name:'Zap',cost:2,hp:0,damage:140},
+ {id:'tesla',name:'Tesla',cost:4,hp:720,damage:160},
+ {id:'goblins',name:'Goblins',cost:2,hp:310,damage:150}
+];
+const KEY='royalSandboxWeb_v1';
+let state={users:{}};
+let current=null;
+let chosen=[];
+
+function uid(){return (crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2));}
+function loadState(){try{const x=JSON.parse(localStorage.getItem(KEY)||'null'); if(x&&x.users) state=x;}catch(e){} refreshAccounts();}
+function persist(){localStorage.setItem(KEY,JSON.stringify(state));refreshAccounts();}
+function defaultDeck(){return CARDS.slice(0,8).map(c=>c.id)}
+function currentUser(){return current?state.users[current]:null}
+
+function createOrLogin(){
+  const raw=document.querySelector('#name').value.trim().slice(0,20);
+  const name=raw||'Player';
+  if(!state.users[name]) state.users[name]={id:uid(),name,gold:9999999,gems:9999999,deck:defaultDeck(),wins:0,losses:0};
+  current=name; chosen=[...state.users[name].deck]; persist(); renderAll();
+}
+function loadSelected(){const name=document.querySelector('#accountSelect').value;if(!name)return;current=name;chosen=[...state.users[name].deck];renderAll();}
+function deleteSelected(){const name=document.querySelector('#accountSelect').value||current;if(!name||!state.users[name])return;if(!confirm(`Delete ${name}?`))return;delete state.users[name];if(current===name){current=null;chosen=[];}persist();renderAll();}
+function refreshAccounts(){
+  const s=document.querySelector('#accountSelect'); if(!s)return;
+  const before=s.value; s.innerHTML='<option value="">Saved accounts</option>'+Object.keys(state.users).map(n=>`<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
+  if(state.users[before])s.value=before;
+}
+function escapeHtml(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+function renderAccount(){
+  const u=currentUser();
+  document.querySelector('#acct').innerHTML=u?`<div class="stats"><div class="stat"><span class="muted">Gold</span><b>🪙 ${u.gold.toLocaleString()}</b></div><div class="stat"><span class="muted">Gems</span><b>💎 ${u.gems.toLocaleString()}</b></div><div class="stat"><span class="muted">Wins</span><b>${u.wins}</b></div><div class="stat"><span class="muted">Losses</span><b>${u.losses}</b></div></div><p><b>${escapeHtml(u.name)}</b></p>`:'';
+}
+function renderCards(){
+  document.querySelector('#cards').innerHTML=CARDS.map(c=>`<div class="card ${chosen.includes(c.id)?'on':''}" data-id="${c.id}"><div class="name">${c.name}</div><div>💧 ${c.cost}</div><div class="meta">HP ${c.hp} · DMG ${c.damage}</div></div>`).join('');
+  document.querySelectorAll('.card').forEach(el=>el.addEventListener('click',()=>toggle(el.dataset.id)));
+  document.querySelector('#count').textContent=`${chosen.length}/8`;
+}
+function renderAll(){refreshAccounts();renderAccount();renderCards();}
+function toggle(id){if(chosen.includes(id))chosen=chosen.filter(x=>x!==id);else if(chosen.length<8)chosen.push(id);else navigator.vibrate?.(40);renderCards();}
+function saveDeck(){const u=currentUser();if(!u)return alert('Create or load an account first.');if(chosen.length!==8)return alert('Choose exactly 8 cards.');u.deck=[...chosen];persist();renderAccount();alert('Deck saved.');}
+function randomDeck(){chosen=[...CARDS].sort(()=>Math.random()-.5).slice(0,8).map(c=>c.id);renderCards();}
+function power(deck){return deck.reduce((sum,c)=>sum+(c.hp*.22+c.damage*2.4)/(c.cost+1),0);}
+function battle(){
+  const u=currentUser();if(!u)return alert('Create or load an account first.');if(!u.deck||u.deck.length!==8)return alert('Save an 8-card deck first.');
+  const cmap=Object.fromEntries(CARDS.map(c=>[c.id,c]));
+  const player=u.deck.map(id=>cmap[id]);
+  const bot=[...CARDS].sort(()=>Math.random()-.5).slice(0,8);
+  const pp=power(player)*(0.88+Math.random()*0.24); const bp=power(bot)*(0.88+Math.random()*0.24);
+  const pTower=Math.max(0,3000-Math.floor(bp*2)); const bTower=Math.max(0,3000-Math.floor(pp*2));
+  let winner=bTower<pTower?'player':pTower<bTower?'bot':(Math.random()<.5?'player':'bot');
+  if(winner==='player')u.wins++;else u.losses++;
+  persist();renderAccount();
+  const result=document.querySelector('#result');
+  result.textContent=winner==='player'?`🏆 You won! Your tower ${pTower} HP · Bot ${bTower} HP`:`💀 Bot won. Your tower ${pTower} HP · Bot ${bTower} HP`;
+  const log=document.querySelector('#battleLog');log.hidden=false;
+  log.textContent=`Your deck: ${player.map(c=>c.name).join(', ')}\n\nBot deck: ${bot.map(c=>c.name).join(', ')}`;
+}
+
+document.querySelector('#loginBtn').addEventListener('click',createOrLogin);
+document.querySelector('#name').addEventListener('keydown',e=>{if(e.key==='Enter')createOrLogin()});
+document.querySelector('#loadBtn').addEventListener('click',loadSelected);
+document.querySelector('#deleteBtn').addEventListener('click',deleteSelected);
+document.querySelector('#saveDeckBtn').addEventListener('click',saveDeck);
+document.querySelector('#randomDeckBtn').addEventListener('click',randomDeck);
+document.querySelector('#battleBtn').addEventListener('click',battle);
+loadState();renderAll();
+</script>
+</body>
+</html>
