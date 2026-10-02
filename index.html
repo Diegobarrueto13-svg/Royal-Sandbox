@@ -1,161 +1,152 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<meta name="theme-color" content="#101522" />
-<title>Royal Sandbox</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Royal Sandbox Online</title>
 <style>
-  :root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;color-scheme:dark}
-  *{box-sizing:border-box}
-  body{margin:0;background:linear-gradient(180deg,#0b1020,#121a2c 40%,#0c1220);color:#fff;min-height:100vh}
-  main{max-width:980px;margin:auto;padding:20px 14px 44px}
-  h1{margin:4px 0 2px;font-size:clamp(28px,7vw,44px)}
-  h2{margin:0 0 12px;font-size:20px}
-  p{line-height:1.45}
-  .sub{opacity:.72;margin-top:0}
-  .panel{background:rgba(28,36,54,.94);border:1px solid rgba(255,255,255,.08);box-shadow:0 14px 30px rgba(0,0,0,.2);padding:16px;border-radius:18px;margin:14px 0}
-  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-  input,select,button{font:inherit;border-radius:12px;border:0;min-height:44px}
-  input,select{padding:10px 12px;background:#101827;color:#fff;border:1px solid rgba(255,255,255,.12);flex:1;min-width:160px}
-  button{padding:10px 14px;background:#f5f7ff;color:#111827;font-weight:800;cursor:pointer}
-  button.secondary{background:#2a3653;color:#fff}
-  button.danger{background:#4a2630;color:#fff}
-  button:active{transform:scale(.98)}
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
-  .stat{background:#131b2d;padding:10px;border-radius:12px;text-align:center}
-  .stat b{display:block;font-size:18px}
-  .muted{opacity:.7}
-  .cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
-  .card{background:#2b3650;padding:12px;border-radius:14px;cursor:pointer;border:2px solid transparent;user-select:none;min-height:108px}
-  .card.on{border-color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.12) inset}
-  .card .name{font-weight:800;margin-bottom:6px}
-  .card .meta{font-size:13px;opacity:.72;margin-top:5px}
-  .deckbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:10px 0}
-  .pill{display:inline-block;background:#111827;padding:6px 10px;border-radius:999px;font-weight:700}
-  .result{font-size:18px;font-weight:800;margin-top:12px;min-height:28px}
-  .battle-log{margin-top:10px;background:#111827;border-radius:12px;padding:10px;white-space:pre-line;font-size:14px;line-height:1.45}
-  .tiny{font-size:12px;opacity:.62}
-  @media(min-width:700px){.cards{grid-template-columns:repeat(4,minmax(0,1fr))}}
+:root{font-family:system-ui,-apple-system,sans-serif;color:#fff;background:#0d1320}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(#111827,#07101d);min-height:100vh}
+.app{max-width:520px;margin:auto;padding:16px}.top{display:flex;justify-content:space-between;align-items:center}
+h1{font-size:24px;margin:6px 0}.pill,.btn{border:1px solid #41506a;background:#172236;color:#fff;border-radius:12px;padding:11px 14px}
+.btn{font-weight:700;cursor:pointer}.primary{background:#2463eb;border-color:#2463eb}.danger{background:#8b2530}
+.panel{background:#111c2e;border:1px solid #2c3b55;border-radius:16px;padding:14px;margin-top:12px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap} input{min-width:0;flex:1;background:#091321;border:1px solid #34445e;color:#fff;padding:12px;border-radius:10px}
+.small{font-size:12px;color:#9fb0c9}.hidden{display:none!important}
+.resources{display:flex;gap:8px;flex-wrap:wrap}.resource{background:#1c2940;padding:8px 10px;border-radius:10px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.card{min-height:76px;background:#1b2a44;border:2px solid transparent;border-radius:12px;padding:7px;text-align:center;font-size:12px;touch-action:manipulation}
+.card.selected{border-color:#ffd54a}.card .icon{font-size:26px}.card .cost{font-weight:800}
+.arena{position:relative;height:430px;border-radius:18px;overflow:hidden;background:linear-gradient(#7eaf62 0 46%,#6ca3d2 46% 54%,#7eaf62 54%);border:3px solid #34445e;margin-top:12px;touch-action:none}
+.line{position:absolute;left:0;right:0;top:50%;height:2px;background:#d9e6f4aa}
+.tower{position:absolute;width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:900;border:3px solid #fff8}
+.enemy{top:18px;background:#b83a4c}.mine{bottom:18px;background:#3977c8}.left{left:32px}.right{right:32px}.king{left:50%;transform:translateX(-50%)}
+.unit{position:absolute;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;transform:translate(-50%,-50%);border:2px solid #fff9}
+.p1{background:#2c6dc4}.p2{background:#b6384b}
+.elixir{height:13px;background:#25113b;border-radius:10px;overflow:hidden;margin:9px 0}.elixir>div{height:100%;background:#c044e5;width:100%}
+.status{text-align:center;font-weight:700;margin:8px 0}.deckTitle{display:flex;justify-content:space-between;align-items:center}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#000d;padding:10px 15px;border-radius:12px;display:none;z-index:10}
 </style>
 </head>
 <body>
-<main>
-  <h1>👑 Royal Sandbox</h1>
-  <p class="sub">Offline browser prototype. Accounts and progress stay on this device.</p>
+<div class="app">
+ <div class="top"><div><h1>⚔️ Royal Sandbox Online</h1><div class="small">fan-made prototype • unlimited sandbox resources</div></div><span id="net" class="pill">Offline</span></div>
 
-  <section class="panel">
-    <h2>Account</h2>
-    <div class="row">
-      <input id="name" maxlength="20" placeholder="Account name" autocomplete="off" />
-      <button id="loginBtn">Create / Login</button>
-    </div>
-    <div class="row" style="margin-top:10px">
-      <select id="accountSelect"><option value="">Saved accounts</option></select>
-      <button class="secondary" id="loadBtn">Load</button>
-      <button class="danger" id="deleteBtn">Delete</button>
-    </div>
-    <div id="acct"></div>
-  </section>
+ <section id="lobby" class="panel">
+   <h3>Private 1v1 room</h3>
+   <div class="row"><input id="name" maxlength="18" placeholder="Your name" value="Player"><button class="btn primary" id="create">Create room</button></div>
+   <div class="row" style="margin-top:8px"><input id="roomCode" maxlength="12" placeholder="Room code"><button class="btn" id="join">Join</button></div>
+   <p class="small">Create a room, then send the private link to the other phone. The second player opens it and taps Join.</p>
+ </section>
 
-  <section class="panel">
-    <h2>Deck Builder</h2>
-    <div class="deckbar"><span class="muted">Choose exactly 8 cards</span><span id="count" class="pill">0/8</span></div>
-    <div id="cards" class="cards"></div>
-    <div class="row" style="margin-top:12px">
-      <button id="saveDeckBtn">Save Deck</button>
-      <button class="secondary" id="randomDeckBtn">Random Deck</button>
-    </div>
-  </section>
+ <section id="roomPanel" class="panel hidden">
+   <div class="row"><strong>Room: <span id="code"></span></strong><button class="btn" id="share">Share room link</button><button class="btn danger" id="leave">Leave</button></div>
+   <div class="status" id="status">Waiting for Player 2…</div>
+   <div class="resources"><span class="resource">🪙 ∞ Gold</span><span class="resource">💎 ∞ Gems</span><span class="resource">🃏 All cards unlocked</span></div>
+ </section>
 
-  <section class="panel">
-    <h2>1v1 Bot Battle</h2>
-    <p class="muted">Quick simulated battle using deck strength, elixir efficiency, and a little randomness.</p>
-    <button id="battleBtn">⚔️ Battle Bot</button>
-    <div id="result" class="result"></div>
-    <div id="battleLog" class="battle-log" hidden></div>
-  </section>
+ <section id="game" class="hidden">
+  <div class="panel">
+   <div class="deckTitle"><strong>Your deck</strong><span class="small">Tap a card, then tap your half of arena</span></div>
+   <div class="cards" id="cards"></div>
+   <div class="elixir"><div id="elixirBar"></div></div><div class="small">Elixir: <span id="elixirText">10.0</span>/10</div>
+  </div>
+  <div class="arena" id="arena">
+    <div class="line"></div>
+    <div class="tower enemy left">👑</div><div class="tower enemy right">👑</div><div class="tower enemy king" style="top:75px">🏰</div>
+    <div class="tower mine left">👑</div><div class="tower mine right">👑</div><div class="tower mine king" style="bottom:75px">🏰</div>
+  </div>
+ </section>
+</div>
+<div id="toast"></div>
 
-  <p class="tiny">This is an independent fan-made prototype. It does not connect to Supercell or Clash Royale servers.</p>
-</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const CARDS=[
- {id:'knight',name:'Knight',cost:3,hp:700,damage:90},
- {id:'archers',name:'Archers',cost:3,hp:420,damage:115},
- {id:'giant',name:'Giant',cost:5,hp:1300,damage:120},
- {id:'fireball',name:'Fireball',cost:4,hp:0,damage:300},
- {id:'mini',name:'Mini P.E.K.K.A',cost:4,hp:650,damage:260},
- {id:'bats',name:'Bats',cost:2,hp:220,damage:145},
- {id:'musk',name:'Musketeer',cost:4,hp:520,damage:175},
- {id:'valk',name:'Valkyrie',cost:4,hp:850,damage:130},
- {id:'hog',name:'Hog Rider',cost:4,hp:900,damage:185},
- {id:'zap',name:'Zap',cost:2,hp:0,damage:140},
- {id:'tesla',name:'Tesla',cost:4,hp:720,damage:160},
- {id:'goblins',name:'Goblins',cost:2,hp:310,damage:150}
+const SUPABASE_URL = "https://ubnbprsfhobypsqzgmfe.supabase.co";
+const SUPABASE_KEY = "sb_publishable_s0_6Ptm5h79qrwJGPCL4iw_oYTgS_C3";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const cards=[
+ ['Knight','⚔️',3],['Archers','🏹',3],['Giant','🗿',5],['Wizard','🧙',5],
+ ['Mini P.E.K.K.A','🤖',4],['Valkyrie','🪓',4],['Musketeer','🔫',4],['Skeletons','💀',1]
 ];
-const KEY='royalSandboxWeb_v1';
-let state={users:{}};
-let current=null;
-let chosen=[];
+let selected=0, room=null, me=null, slot=null, channel=null, elixir=10, units=[], lastSync=0;
+const $=id=>document.getElementById(id);
+const uid=()=>crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2)+Date.now();
+me=localStorage.rsPlayerId || uid(); localStorage.rsPlayerId=me;
 
-function uid(){return (crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2));}
-function loadState(){try{const x=JSON.parse(localStorage.getItem(KEY)||'null'); if(x&&x.users) state=x;}catch(e){} refreshAccounts();}
-function persist(){localStorage.setItem(KEY,JSON.stringify(state));refreshAccounts();}
-function defaultDeck(){return CARDS.slice(0,8).map(c=>c.id)}
-function currentUser(){return current?state.users[current]:null}
+function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',1800)}
+function code(){return Math.random().toString(36).slice(2,8).toUpperCase()}
+function renderCards(){ $('cards').innerHTML=cards.map((c,i)=>`<button class="card ${i===selected?'selected':''}" data-i="${i}"><div class=icon>${c[1]}</div>${c[0]}<div class=cost>💧${c[2]}</div></button>`).join('');
+ document.querySelectorAll('.card').forEach(b=>b.onclick=()=>{selected=+b.dataset.i;renderCards()});}
+renderCards();
 
-function createOrLogin(){
-  const raw=document.querySelector('#name').value.trim().slice(0,20);
-  const name=raw||'Player';
-  if(!state.users[name]) state.users[name]={id:uid(),name,gold:9999999,gems:9999999,deck:defaultDeck(),wins:0,losses:0};
-  current=name; chosen=[...state.users[name].deck]; persist(); renderAll();
+async function createRoom(){
+ const id=code(), name=$('name').value.trim()||'Player 1';
+ const state={units:[],seq:0,started:false};
+ const {error}=await sb.from('rooms').insert({id,player1_id:me,player1_name:name,status:'waiting',game_state:state});
+ if(error)return toast(error.message); slot=1; await enter(id);
 }
-function loadSelected(){const name=document.querySelector('#accountSelect').value;if(!name)return;current=name;chosen=[...state.users[name].deck];renderAll();}
-function deleteSelected(){const name=document.querySelector('#accountSelect').value||current;if(!name||!state.users[name])return;if(!confirm(`Delete ${name}?`))return;delete state.users[name];if(current===name){current=null;chosen=[];}persist();renderAll();}
-function refreshAccounts(){
-  const s=document.querySelector('#accountSelect'); if(!s)return;
-  const before=s.value; s.innerHTML='<option value="">Saved accounts</option>'+Object.keys(state.users).map(n=>`<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
-  if(state.users[before])s.value=before;
+async function joinRoom(idArg){
+ const id=(idArg||$('roomCode').value).trim().toUpperCase(); if(!id)return;
+ const {data:r,error}=await sb.from('rooms').select('*').eq('id',id).single();
+ if(error||!r)return toast('Room not found');
+ if(r.player1_id===me) slot=1;
+ else if(r.player2_id===me) slot=2;
+ else if(!r.player2_id){
+   const name=$('name').value.trim()||'Player 2';
+   const st={...(r.game_state||{}),started:true};
+   const {error:e}=await sb.from('rooms').update({player2_id:me,player2_name:name,status:'playing',game_state:st}).eq('id',id).is('player2_id',null);
+   if(e)return toast('Room was already joined'); slot=2;
+ } else return toast('Room is full');
+ await enter(id);
 }
-function escapeHtml(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
-function renderAccount(){
-  const u=currentUser();
-  document.querySelector('#acct').innerHTML=u?`<div class="stats"><div class="stat"><span class="muted">Gold</span><b>🪙 ${u.gold.toLocaleString()}</b></div><div class="stat"><span class="muted">Gems</span><b>💎 ${u.gems.toLocaleString()}</b></div><div class="stat"><span class="muted">Wins</span><b>${u.wins}</b></div><div class="stat"><span class="muted">Losses</span><b>${u.losses}</b></div></div><p><b>${escapeHtml(u.name)}</b></p>`:'';
+async function enter(id){
+ room=id;$('lobby').classList.add('hidden');$('roomPanel').classList.remove('hidden');$('code').textContent=id;
+ history.replaceState({},'',location.pathname+'?room='+encodeURIComponent(id));
+ await subscribe(); await refresh();
 }
-function renderCards(){
-  document.querySelector('#cards').innerHTML=CARDS.map(c=>`<div class="card ${chosen.includes(c.id)?'on':''}" data-id="${c.id}"><div class="name">${c.name}</div><div>💧 ${c.cost}</div><div class="meta">HP ${c.hp} · DMG ${c.damage}</div></div>`).join('');
-  document.querySelectorAll('.card').forEach(el=>el.addEventListener('click',()=>toggle(el.dataset.id)));
-  document.querySelector('#count').textContent=`${chosen.length}/8`;
+async function subscribe(){
+ if(channel) await sb.removeChannel(channel);
+ channel=sb.channel('room-'+room).on('postgres_changes',{event:'UPDATE',schema:'public',table:'rooms',filter:'id=eq.'+room},p=>applyRoom(p.new)).subscribe(s=>{
+   $('net').textContent=s==='SUBSCRIBED'?'Live 🟢':'Connecting…';
+ });
 }
-function renderAll(){refreshAccounts();renderAccount();renderCards();}
-function toggle(id){if(chosen.includes(id))chosen=chosen.filter(x=>x!==id);else if(chosen.length<8)chosen.push(id);else navigator.vibrate?.(40);renderCards();}
-function saveDeck(){const u=currentUser();if(!u)return alert('Create or load an account first.');if(chosen.length!==8)return alert('Choose exactly 8 cards.');u.deck=[...chosen];persist();renderAccount();alert('Deck saved.');}
-function randomDeck(){chosen=[...CARDS].sort(()=>Math.random()-.5).slice(0,8).map(c=>c.id);renderCards();}
-function power(deck){return deck.reduce((sum,c)=>sum+(c.hp*.22+c.damage*2.4)/(c.cost+1),0);}
-function battle(){
-  const u=currentUser();if(!u)return alert('Create or load an account first.');if(!u.deck||u.deck.length!==8)return alert('Save an 8-card deck first.');
-  const cmap=Object.fromEntries(CARDS.map(c=>[c.id,c]));
-  const player=u.deck.map(id=>cmap[id]);
-  const bot=[...CARDS].sort(()=>Math.random()-.5).slice(0,8);
-  const pp=power(player)*(0.88+Math.random()*0.24); const bp=power(bot)*(0.88+Math.random()*0.24);
-  const pTower=Math.max(0,3000-Math.floor(bp*2)); const bTower=Math.max(0,3000-Math.floor(pp*2));
-  let winner=bTower<pTower?'player':pTower<bTower?'bot':(Math.random()<.5?'player':'bot');
-  if(winner==='player')u.wins++;else u.losses++;
-  persist();renderAccount();
-  const result=document.querySelector('#result');
-  result.textContent=winner==='player'?`🏆 You won! Your tower ${pTower} HP · Bot ${bTower} HP`:`💀 Bot won. Your tower ${pTower} HP · Bot ${bTower} HP`;
-  const log=document.querySelector('#battleLog');log.hidden=false;
-  log.textContent=`Your deck: ${player.map(c=>c.name).join(', ')}\n\nBot deck: ${bot.map(c=>c.name).join(', ')}`;
+async function refresh(){const {data}=await sb.from('rooms').select('*').eq('id',room).single();if(data)applyRoom(data)}
+function applyRoom(r){
+ const playing=!!r.player1_id&&!!r.player2_id;
+ $('status').textContent=playing?`${r.player1_name||'Player 1'} vs ${r.player2_name||'Player 2'}`:'Waiting for Player 2…';
+ $('game').classList.toggle('hidden',!playing);
+ const incoming=(r.game_state&&r.game_state.units)||[];
+ units=incoming; renderUnits();
 }
+function renderUnits(){
+ document.querySelectorAll('.unit').forEach(n=>n.remove());
+ for(const u of units){
+   const d=document.createElement('div');d.className='unit p'+u.owner;d.textContent=u.icon;
+   // Player 2 sees arena rotated so their side is at bottom.
+   const x=slot===2?100-u.x:u.x, y=slot===2?100-u.y:u.y;
+   d.style.left=x+'%';d.style.top=y+'%';$('arena').appendChild(d);
+ }
+}
+$('arena').addEventListener('pointerdown',async e=>{
+ if(!room||!slot)return;
+ const c=cards[selected]; if(elixir<c[2])return toast('Not enough elixir');
+ const rect=$('arena').getBoundingClientRect(); let x=(e.clientX-rect.left)/rect.width*100, y=(e.clientY-rect.top)/rect.height*100;
+ if(y<52)return toast('Deploy on your side');
+ if(slot===2){x=100-x;y=100-y}
+ elixir-=c[2];
+ const u={id:uid(),owner:slot,card:c[0],icon:c[1],x:+x.toFixed(2),y:+y.toFixed(2),t:Date.now()};
+ // Fetch before write to reduce stale overwrites in this lightweight prototype.
+ const {data:r}=await sb.from('rooms').select('game_state').eq('id',room).single();
+ const st=r?.game_state||{}; const next=[...(st.units||[]),u].slice(-80);
+ await sb.from('rooms').update({game_state:{...st,units:next,seq:(st.seq||0)+1,started:true}}).eq('id',room);
+});
+setInterval(()=>{elixir=Math.min(10,elixir+.12);$('elixirText').textContent=elixir.toFixed(1);$('elixirBar').style.width=(elixir*10)+'%'},300);
 
-document.querySelector('#loginBtn').addEventListener('click',createOrLogin);
-document.querySelector('#name').addEventListener('keydown',e=>{if(e.key==='Enter')createOrLogin()});
-document.querySelector('#loadBtn').addEventListener('click',loadSelected);
-document.querySelector('#deleteBtn').addEventListener('click',deleteSelected);
-document.querySelector('#saveDeckBtn').addEventListener('click',saveDeck);
-document.querySelector('#randomDeckBtn').addEventListener('click',randomDeck);
-document.querySelector('#battleBtn').addEventListener('click',battle);
-loadState();renderAll();
+$('create').onclick=createRoom;$('join').onclick=()=>joinRoom();
+$('share').onclick=async()=>{const url=location.origin+location.pathname+'?room='+room;try{await navigator.share({title:'Royal Sandbox 1v1',text:'Join my private room '+room,url})}catch{await navigator.clipboard.writeText(url);toast('Room link copied')}};
+$('leave').onclick=async()=>{if(channel)await sb.removeChannel(channel);room=null;slot=null;history.replaceState({},'',location.pathname);$('game').classList.add('hidden');$('roomPanel').classList.add('hidden');$('lobby').classList.remove('hidden');$('net').textContent='Offline'};
+const q=new URLSearchParams(location.search).get('room');if(q){$('roomCode').value=q.toUpperCase();toast('Room link loaded — tap Join')}
 </script>
-</body>
-</html>
+</body></html>

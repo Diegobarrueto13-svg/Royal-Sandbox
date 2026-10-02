@@ -1,19 +1,33 @@
-ROYAL SANDBOX — PHONE WEB VERSION
+ROYAL SANDBOX ONLINE — CONNECTED PROTOTYPE
 
-What it includes
-- Multiple local accounts
-- 9,999,999 gold and gems
-- 12 sample cards
-- 8-card deck builder
-- Random bot decks
-- Basic 1v1 battle simulator
-- Win/loss tracking
-- Saves data in browser localStorage
+Files
+- index.html: mobile browser game prototype
 
-IMPORTANT FOR IPHONE
-This version has no Python/server dependency. It is a static website.
-For the best iPhone/Safari experience, upload the folder to any HTTPS static host (GitHub Pages, Netlify, Cloudflare Pages, etc.), then open the resulting URL in Safari.
+Features
+- Supabase-backed private room codes
+- Shareable ?room=CODE links
+- Realtime room updates between two phones
+- Two player slots
+- Unlimited gold/gems display and all prototype cards unlocked
+- Mobile card selection and arena deployment
+- Shared synchronized unit placements
 
-You can also test index.html on a desktop browser by opening it directly.
+Deploy on GitHub Pages
+1. Replace the old index.html with this index.html.
+2. Commit the change to main.
+3. Settings > Pages > Deploy from a branch > main > /(root).
+4. Open the GitHub Pages URL.
+5. Phone 1 creates a room and shares its link.
+6. Phone 2 opens the link and taps Join.
 
-All progress is local to that browser/device. Clearing Safari website data can erase the saved accounts.
+SECURITY
+This prototype uses the browser-safe Supabase publishable key.
+The current prototype database policies are intentionally permissive.
+Do not store passwords, emails, secret keys, or sensitive information in the rooms table.
+Before public release, replace the prototype RLS policies with authenticated/room-scoped policies.
+
+NOTE
+This is an original browser prototype, not the official Clash Royale client/server.
+The current realtime implementation synchronizes room membership and card deployments.
+Full authoritative combat simulation, tower damage, win conditions, matchmaking, and anti-cheat
+would be subsequent development steps.
